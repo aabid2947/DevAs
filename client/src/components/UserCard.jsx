@@ -8,9 +8,7 @@ import imageUrl from "../assets/imageURL.jpg";
 
 export default function UserCard() {
   const { token, user, logout } = useAuth();
-  useEffect(() => {
-    console.log(user);
-  }, []);
+
 
   return (
     <div className="lg:col-span-3">

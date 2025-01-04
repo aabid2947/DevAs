@@ -11,11 +11,10 @@ export default function FriendRequests() {
 
   // Query to fetch friend requests
   const { isLoading: isFetching, isError, error } = useQuery(
-    "friendRequests",
+    "friend",
     getFriendRequests,
     {
       onSuccess: (res) => {
-        console.log(res.data.data);
         setFriendRequests(res.data.data);
   
       },

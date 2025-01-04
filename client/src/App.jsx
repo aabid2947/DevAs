@@ -3,7 +3,6 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login';
 import Register from './components/Register';
-import Home from './components/Home';
 import Navbar from './components/Navbar';
 import MainHome from './components/MainHome'
 

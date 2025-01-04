@@ -1,17 +1,16 @@
-import { React, useState } from "react";
+import { React, useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, User, Search, FileText, Edit2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { searchUsers,sendFriendRequest } from "../utils/api";
-import { useQuery,useMutation } from "react-query";
+import { searchUsers, sendFriendRequest } from "../utils/api";
+import { useQuery, useMutation } from "react-query";
 import { FaUserPlus } from "react-icons/fa";
+import { Search, User, X } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const fetchUser = async (query) => {
-  console.log("Fetching users with query:", query);
   try {
     const response = await searchUsers(query);
-    console.log("Fetch response:", response);
 
     return response;
   } catch (error) {
@@ -21,19 +20,27 @@ const fetchUser = async (query) => {
 };
 
 export default function SearchUser() {
+  const { user } = useAuth();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [triggerSearch, setTriggerSearch] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
+  const [isSearchedUserFriend, setIsSearchedUserFriend] = useState(false);
 
   const {
     data: users,
     isLoadinguser,
     isError,
     error,
-  } = useQuery(["searchUser", searchQuery], () => fetchUser(searchQuery), {
+  } = useQuery(["searchedUsers", searchQuery], () => fetchUser(searchQuery), {
     enabled: triggerSearch && searchQuery.length > 0, // Trigger query only when conditions are met
     onSuccess: (data) => {
-      console.log("Query successful, users fetched:", data.data);
+      // // Check if the searched user is already a friend
+      const friendIds = user.friendList.map((friend) => friend._id);
+      const isFriend = friendIds.includes(data.data._id);
+      setIsSearchedUserFriend(isFriend);
+      console.log("isFriend:", user.friendList);
+
       setSearchedUsers(data.data);
       setTriggerSearch(false);
     },
@@ -68,7 +75,6 @@ export default function SearchUser() {
   };
   return (
     <div className="lg:col-span-3 space-y-6">
-
       <div className="w-full max-w-sm  bg-background rounded-lg border">
         <div className="p-4 border-b">
           <div className="relative">
@@ -80,6 +86,20 @@ export default function SearchUser() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
             />
+            {/* Cross Icon to clear search query */}
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery(""); // Clear search query
+                  setSearchedUsers([])
+                  
+                  
+                }}
+                className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
+              >
+                <X />
+              </button>
+            )}
           </div>
         </div>
         <ScrollArea className="h-[400px]">
@@ -110,14 +130,18 @@ export default function SearchUser() {
                       )}
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleSendRequest(user._id)}
-                    className="text-blue-500 hover:text-blue-600"
-                    title="Add Friend"
-                    disabled={isLoading}
-                  >
-                    <FaUserPlus size={20} />
-                  </button>
+                  {isSearchedUserFriend ? (
+                    <></>
+                  ) : (
+                    <button
+                      onClick={() => handleSendRequest(user._id)}
+                      className="text-blue-500 hover:text-blue-600"
+                      title="Add Friend"
+                      disabled={isLoading}
+                    >
+                      <FaUserPlus size={20} />
+                    </button>
+                  )}
                 </div>
               ))
             ) : (

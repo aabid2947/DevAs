@@ -26,6 +26,8 @@ export const getFriendRequests = () => api.get('/friends/requests');
 export const acceptFriendRequest = (requestId) => api.post('/friends/accept', { requestId });
 export const rejectFriendRequest = (requestId) => api.post('/friends/reject', { requestId });
 export const getFriendList = () => api.get('/friends/list');
+export const getAlllUsers = () => api.get('/users/all-users');
+
 
 export default api;
 

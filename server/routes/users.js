@@ -56,5 +56,15 @@ router.get('/recommendations', auth, async (req, res) => {
   }
 });
 
+router.get('/all-users', auth, async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // Excluding the password field
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 export default router;
 

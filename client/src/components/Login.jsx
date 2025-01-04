@@ -1,4 +1,3 @@
-'use client'
 
 import { useState,useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -35,13 +34,12 @@ export default function Login() {
     try {
       const response = await login(email, password)
 
-      
+      console.log(response.data)
       // Store the user and token in localStorage
       localStorage.setItem("user", JSON.stringify(response.data.user))
       localStorage.setItem("token", response.data.token)
       
       authLogin(response.data.user, response.data.token)
-      console.log(response.data)
       navigate("/")
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred")

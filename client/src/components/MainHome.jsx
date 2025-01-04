@@ -1,19 +1,4 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
-import { useQuery, useMutation, useQueryClient } from "react-query";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-
+import {  useState } from "react";
 import SearchUser from "./SearchUser";
 import FriendRequests from "../components/FriendRequests";
 import UserCard from "./UserCard";
@@ -22,10 +7,9 @@ import SuggestedUser from "./SuggestedUser";
 
 
 export default function MainHome() {
-  const [friendList, setFriendList] = useState([]);
   const [activeTab, setActiveTab] = useState("friendRequest"); // Added state to handle tab switching
 
-  useEffect(() => {}, []);
+
 
   return (
     <div className="min-h-screen bg-gray-50">
