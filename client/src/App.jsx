@@ -1,18 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Login from './components/Login';
+import Register from './components/Register';
+import Home from './components/Home';
+import Navbar from './components/Navbar';
+import MainHome from './components/MainHome'
 
+const queryClient = new QueryClient();
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <h1 className='text-black text-xl font-bold'>Hello </h1>
-      </div>
-     
-    </>
-  )
+function PrivateRoute({ children }) {
+  const { token } = useAuth();
+  return token ? children : <Navigate to="/login" />;
 }
 
-export default App
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-100">
+            <Navbar />
+            <div className="container mx-auto px-4 py-8">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <MainHome />
+                    </PrivateRoute>
+                  }
+                />
+              </Routes>
+            </div>
+          </div>
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
+

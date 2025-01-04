@@ -16,9 +16,10 @@ app.use(cors());
 app.use(express.json());
 
 
-const mongostring = 
+const mongostring = process.env.MONGODB_URI;
+console.log(mongostring)
 // Database connection
-mongoose.connect('mongodb+srv://aabidhussainpas:5CuQigLjiekAOasn@cluster0.d3r2e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect(mongostring)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -30,3 +31,4 @@ app.use('/api/friends', friendRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
