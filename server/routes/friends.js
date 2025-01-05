@@ -82,7 +82,7 @@ router.get('/list', auth, async (req, res) => {
   try {
     const userId = req.user.id;
     const user = await User.findById(userId).populate('friends', 'username email');
-    console.log(user);
+    
     
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -102,12 +102,10 @@ router.get('/requests', auth,async (req, res) => {
       recipient: req.user.id, // req.user.id comes from authentication middleware
       status: 'pending',
     })
-      .populate('sender', 'username email') // Populate the sender's info (optional)
-      .exec();
       
       if (!friendRequests || friendRequests.length === 0) {
-      console.log('no');
-      return res.status(404).json({ message: 'No friend requests found' });
+      
+      return res.status(200).json({data:[]});
     }
 
     return res.status(200).json({ data: friendRequests });
