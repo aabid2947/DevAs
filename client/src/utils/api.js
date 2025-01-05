@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://server-6y6hc3whv-aabid2947s-projects.vercel.app/api'; // Corrected API URL
 
 const api = axios.create({
   baseURL: API_URL,
