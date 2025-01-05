@@ -1,36 +1,40 @@
-'use client'
+'use client';
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { register } from "../utils/api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { FaGoogle, FaApple } from "react-icons/fa"
-import Leaf from "../assets/leaf.png"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { register } from "../utils/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { FaGoogle, FaApple } from "react-icons/fa";
+import Leaf from "../assets/leaf.png";
 
 export default function Register() {
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const { login } = useAuth()
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [interests, setInterests] = useState(""); // State for interests
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const response = await register(username, email, password)
-      alert(response.data.message)
-      localStorage.setItem("user", JSON.stringify(response.data.user))
-      localStorage.setItem("token", response.data.token)
-      login(response.data.user, response.data.token)
-      navigate("/")
+      // Split interests by comma and trim whitespace
+      const interestsArray = interests.split(",").map((item) => item.trim());
+
+      const response = await register(username, email, password, interestsArray);
+      alert(response.data.message);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("token", response.data.token);
+      login(response.data.user, response.data.token);
+      navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "An error occurred")
+      setError(err.response?.data?.message || "An error occurred");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0f1116] p-4">
@@ -38,7 +42,9 @@ export default function Register() {
         <div className="flex flex-col lg:flex-row">
           <CardContent className="p-8 lg:w-1/2">
             <div className="max-w-md mx-auto">
-              <h2 className="text-2xl font-semibold mb-6 text-zinc-100">Get Started Now</h2>
+              <h2 className="text-2xl font-semibold mb-6 text-zinc-100">
+                Get Started Now
+              </h2>
               {error && <p className="text-red-400 mb-4">{error}</p>}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -89,6 +95,22 @@ export default function Register() {
                     className="w-full bg-[#1c1f2a] border-zinc-700 text-zinc-100 focus:border-purple-500 focus:ring-purple-500"
                   />
                 </div>
+                <div>
+                  <label
+                    htmlFor="interests"
+                    className="block text-sm font-medium text-zinc-300 mb-1"
+                  >
+                    Interests (comma-separated)
+                  </label>
+                  <Input
+                    type="text"
+                    id="interests"
+                    value={interests}
+                    onChange={(e) => setInterests(e.target.value)}
+                    placeholder="e.g., coding, reading, traveling"
+                    className="w-full bg-[#1c1f2a] border-zinc-700 text-zinc-100 focus:border-purple-500 focus:ring-purple-500"
+                  />
+                </div>
                 <Button
                   type="submit"
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white"
@@ -130,6 +152,5 @@ export default function Register() {
         </div>
       </Card>
     </div>
-  )
+  );
 }
-

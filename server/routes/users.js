@@ -30,23 +30,27 @@ router.get('/recommendations', auth, async (req, res) => {
     }
 
     const friendIds = user.friends.map(friend => friend._id);
+    const userInterests = user.interests;
+
     const recommendations = await User.aggregate([
-      { $match: { _id: { $nin: [...friendIds, userId] } } },
-      { $lookup: {
-          from: 'users',
-          localField: 'friends',
-          foreignField: '_id',
-          as: 'mutualFriends'
+      {
+        $match: {
+          _id: { $nin: [...friendIds, userId] }, // Exclude current user and friends
+          interests: { $in: userInterests },    // At least one common interest
         }
       },
-      { $project: {
+      {
+        $project: {
           username: 1,
           email: 1,
-          mutualFriendsCount: { $size: { $setIntersection: ['$mutualFriends._id', friendIds] } }
+          interests: 1,
+          mutualInterestsCount: {
+            $size: { $setIntersection: ['$interests', userInterests] }
+          }
         }
       },
-      { $sort: { mutualFriendsCount: -1 } },
-      { $limit: 10 }
+      { $sort: { mutualInterestsCount: -1 } }, // Sort by number of mutual interests
+      { $limit: 10 } // Limit to 10 recommendations
     ]);
 
     res.json(recommendations);

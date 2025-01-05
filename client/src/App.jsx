@@ -21,7 +21,6 @@ export default function App() {
         <Router>
           <div className=" min-h-screen bg-gray-100">
             <Navbar />
-            <div className="container  bg-[#0f1116] mx-auto px-4 py-8">
               
               <Routes>
                 <Route path="/login" element={<Login />} />
@@ -35,7 +34,7 @@ export default function App() {
                   }
                 />
               </Routes>
-            </div>
+            
           </div>
         </Router>
       </AuthProvider>

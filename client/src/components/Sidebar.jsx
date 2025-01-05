@@ -1,10 +1,7 @@
-
 import React from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { User, Settings, LogOut, MessageSquare, Users, Bell, Search, Home } from 'lucide-react'
 import { useAuth } from "../contexts/AuthContext"
 
@@ -20,8 +17,8 @@ export default function Sidebar() {
   ]
 
   return (
-    <Card className="h-screen w-64 bg-[#161920] border-r border-zinc-800">
-      <CardContent className="flex flex-col h-full p-0">
+    <div className="fixed left-0 top-0 h-screen w-64 bg-[#161920] border-r border-zinc-800 flex flex-col">
+      <CardContent className="flex flex-col p-0">
         <div className="p-4 border-b border-zinc-800">
           <div className="flex items-center gap-3 mb-4">
             <Avatar className="h-10 w-10 border border-zinc-700">
@@ -40,7 +37,7 @@ export default function Sidebar() {
           </Button>
         </div>
 
-        <ScrollArea className="flex-grow px-2 py-4">
+        <div className="flex-grow px-2 py-4 overflow-hidden">
           <nav className="space-y-2">
             {menuItems.map((item, index) => (
               <Button
@@ -53,7 +50,7 @@ export default function Sidebar() {
               </Button>
             ))}
           </nav>
-        </ScrollArea>
+        </div>
 
         <div className="p-4 border-t border-zinc-800 space-y-2">
           <Button
@@ -73,6 +70,6 @@ export default function Sidebar() {
           </Button>
         </div>
       </CardContent>
-    </Card>
+    </div>
   )
 }

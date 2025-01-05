@@ -8,9 +8,11 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    interests: [{ type: String }], // Array of interests
   },
   { timestamps: true }
 );
+
 
 // Pre-save middleware for hashing passwords
 UserSchema.pre('save', async function (next) {
