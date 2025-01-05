@@ -1,31 +1,31 @@
-import { React, useEffect, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { searchUsers, sendFriendRequest } from "../utils/api";
-import { useQuery, useMutation } from "react-query";
-import { FaUserPlus } from "react-icons/fa";
-import { Search, User, X } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+
+import { React, useEffect, useState } from "react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from "@/components/ui/input"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { searchUsers, sendFriendRequest } from "../utils/api"
+import { useQuery, useMutation } from "react-query"
+import { Search, User, X, MoreVertical } from 'lucide-react'
+import { useAuth } from "../contexts/AuthContext"
 
 const fetchUser = async (query) => {
   try {
-    const response = await searchUsers(query);
-
-    return response;
+    const response = await searchUsers(query)
+    return response
   } catch (error) {
-    console.error("Error in fetchUser:", error);
-    throw error; // Ensure errors propagate to `useQuery`
+    console.error("Error in fetchUser:", error)
+    throw error
   }
-};
+}
 
 export default function SearchUser() {
-  const { user } = useAuth();
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [triggerSearch, setTriggerSearch] = useState(false);
-  const [searchedUsers, setSearchedUsers] = useState([]);
-  const [isSearchedUserFriend, setIsSearchedUserFriend] = useState(false);
+  const { user } = useAuth()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [triggerSearch, setTriggerSearch] = useState(false)
+  const [searchedUsers, setSearchedUsers] = useState([])
+  const [isSearchedUserFriend, setIsSearchedUserFriend] = useState(false)
 
   const {
     data: users,
@@ -33,125 +33,126 @@ export default function SearchUser() {
     isError,
     error,
   } = useQuery(["searchedUsers", searchQuery], () => fetchUser(searchQuery), {
-    enabled: triggerSearch && searchQuery.length > 0, // Trigger query only when conditions are met
+    enabled: triggerSearch && searchQuery.length > 0,
     onSuccess: (data) => {
-      // // Check if the searched user is already a friend
-      const friendIds = user.friendList.map((friend) => friend._id);
-      const isFriend = friendIds.includes(data.data._id);
-      setIsSearchedUserFriend(isFriend);
-      console.log("isFriend:", user.friendList);
-
-      setSearchedUsers(data.data);
-      setTriggerSearch(false);
+      const friendIds = user.friendList.map((friend) => friend._id)
+      const isFriend = friendIds.includes(data.data._id)
+      setIsSearchedUserFriend(isFriend)
+      setSearchedUsers(data.data)
+      setTriggerSearch(false)
     },
     onError: (err) => {
-      console.error("Query failed:", err.message);
+      console.error("Query failed:", err.message)
     },
     onSettled: () => {
-      console.log("Query settled (success or error)");
+      console.log("Query settled (success or error)")
     },
-  });
+  })
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault();
-      setTriggerSearch(true); // Trigger the query
+      e.preventDefault()
+      setTriggerSearch(true)
     }
-  };
+  }
 
-  // Mutation for sending friend requests
   const { mutate: sendRequest, isLoading } = useMutation(sendFriendRequest, {
     onSuccess: () => {
-      alert("Friend request sent successfully!"); // Replace with better UI feedback
+      alert("Friend request sent successfully!")
     },
     onError: (error) => {
-      console.error("Error sending friend request:", error);
-      alert("Failed to send friend request."); // Replace with better UI feedback
+      console.error("Error sending friend request:", error)
+      alert("Failed to send friend request.")
     },
-  });
+  })
 
   const handleSendRequest = (recipientId) => {
-    sendRequest(recipientId); // Call the mutation function
-  };
+    sendRequest(recipientId)
+  }
+
   return (
-    <div className="lg:col-span-3 space-y-6">
-      <div className="w-full max-w-sm  bg-background rounded-lg border">
-        <div className="p-4 border-b">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search contacts..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            {/* Cross Icon to clear search query */}
-            {searchQuery && (
-              <button
-                onClick={() => {
-                  setSearchQuery(""); // Clear search query
-                  setSearchedUsers([])
-                  
-                  
-                }}
-                className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
-              >
-                <X />
-              </button>
-            )}
-          </div>
+    <div className="w-full max-w-md bg-[#161920] rounded-lg">
+      <div className="flex items-center justify-between p-4">
+        <h3 className="text-sm font-semibold text-zinc-200">SEARCH USERS</h3>
+        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-zinc-300">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      <div className="px-4 pb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Input
+            placeholder="Search users..."
+            className="pl-10 bg-[#1c1f2a] border-zinc-700 text-zinc-200 placeholder:text-zinc-500 focus:border-purple-500 focus:ring-purple-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSearchQuery("")
+                setSearchedUsers([])
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 hover:text-zinc-400 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
-        <ScrollArea className="h-[400px]">
-          <div className="p-2">
-            {searchedUsers.length > 0 ? (
-              searchedUsers.map((user) => (
-                <div
-                  key={user._id}
-                  className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
-                >
-                  <div className="relative flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                    {true && (
-                      <span className="absolute bottom-0 right-0 w-3 h-3 border-2 border-background rounded-full bg-green-500" />
-                    )}
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
+      </div>
+
+      <ScrollArea className="h-[400px] px-4 pb-4">
+        {searchedUsers.length > 0 ? (
+          <div className="space-y-2">
+            {searchedUsers.map((user) => (
+              <div
+                key={user._id}
+                className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-[#1c1f2a] transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 border border-zinc-800">
+                    <AvatarFallback className="bg-[#1c1f2a]">
+                      <User className="h-4 w-4 text-zinc-400" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-medium text-zinc-200">
                         {user.username}
                       </span>
-                      {user.email && (
-                        <span className="text-xs text-muted-foreground">
-                          {user.email}
-                        </span>
+                      {user.verified && (
+                        <Badge variant="secondary" className="h-4 w-4 bg-blue-500/20 text-blue-400">
+                          ✓
+                        </Badge>
                       )}
                     </div>
+                    {user.email && (
+                      <span className="text-xs text-zinc-500">
+                        {user.email}
+                      </span>
+                    )}
                   </div>
-                  {isSearchedUserFriend ? (
-                    <></>
-                  ) : (
-                    <button
-                      onClick={() => handleSendRequest(user._id)}
-                      className="text-blue-500 hover:text-blue-600"
-                      title="Add Friend"
-                      disabled={isLoading}
-                    >
-                      <FaUserPlus size={20} />
-                    </button>
-                  )}
                 </div>
-              ))
-            ) : (
-              <div className="text-center text-muted-foreground">
-                No users found
+                {!isSearchedUserFriend && (
+                  <Button
+                    onClick={() => handleSendRequest(user._id)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 h-8"
+                    disabled={isLoading}
+                  >
+                    Follow
+                  </Button>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        </ScrollArea>
-      </div>
+        ) : (
+          <div className="text-center text-zinc-500 py-4">
+            No users found
+          </div>
+        )}
+      </ScrollArea>
     </div>
-  );
+  )
 }

@@ -1,107 +1,113 @@
-import { React, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useQuery, useMutation } from "react-query";
-import { getFriendRequests, acceptFriendRequest } from "../utils/api";
-import { User } from "lucide-react";
-import { FaCheckCircle } from "react-icons/fa";
+
+
+import { React, useState } from "react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { useQuery, useMutation } from "react-query"
+import { getFriendRequests, acceptFriendRequest } from "../utils/api"
+import { User, MoreVertical } from 'lucide-react'
+import { Badge } from "@/components/ui/badge"
 
 export default function FriendRequests() {
-  const [friendRequests, setFriendRequests] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([])
 
-  // Query to fetch friend requests
   const { isLoading: isFetching, isError, error } = useQuery(
-    "friend",
+    "friendRequests",
     getFriendRequests,
     {
       onSuccess: (res) => {
-        setFriendRequests(res.data.data);
-  
+        setFriendRequests(res.data.data)
       },
       onError: (err) => {
-        console.error("Error fetching friend requests:");
+        console.error("Error fetching friend requests:")
       },
-      enabled: false, // Disable automatic execution
-      refetchOnWindowFocus: false, // Disable refetching when the window regains focus
-      refetchOnReconnect: false, // Disable refetching when the network reconnects
+      enabled: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
-  );
+  )
 
-  // Mutation to accept friend requests
   const { mutate: acceptRequest, isLoading: isAccepting } = useMutation(
     acceptFriendRequest,
     {
       onSuccess: () => {
-        alert("Friend request accepted!");
-        // Refetch friend requests after accepting one
-       // Refetch friend requests after accepting one
-       refetch(); // This will refresh the list of friend requests
+        alert("Friend request accepted!")
+        refetch()
       },
       onError: (err) => {
-        console.error("Error accepting friend request:", err.message);
-        alert("Failed to accept friend request.");
+        console.error("Error accepting friend request:", err.message)
+        alert("Failed to accept friend request.")
       },
     }
-  );
+  )
 
   const handleAcceptRequest = (requestId) => {
-    acceptRequest(requestId);
-  };
+    acceptRequest(requestId)
+  }
 
   return (
-    <div className="lg:col-span-3 space-y-6">
-      <h3 className="font-medium text-sm text-gray-500">Friend Requests</h3>
+    <div className="w-full max-w-md p-4 bg-[#161920] rounded-lg">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-sm font-semibold text-zinc-200">Friend Requests</h3>
+        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-zinc-300">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </div>
 
-      <div className="w-full max-w-sm mx-auto bg-background rounded-lg border">
-        <ScrollArea className="h-[400px]">
-          <div className="p-2">
-            {isFetching ? (
-              <div className="text-center text-muted-foreground">Loading...</div>
-            ) : isError ? (
-              <div className="text-center text-red-500">
-                Error fetching friend requests.
-              </div>
-            ) : friendRequests.length > 0 ? (
-              friendRequests.map((sender) => (
-                <div
-                  key={sender._id}
-                  className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
-                >
-                  <div className="relative flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium ">  
+      <ScrollArea className="h-[400px] pr-4">
+        {isFetching ? (
+          <div className="text-center text-zinc-500">Loading...</div>
+        ) : isError ? (
+          <div className="text-center text-red-400">
+            Error fetching friend requests.
+          </div>
+        ) : friendRequests.length > 0 ? (
+          <div className="space-y-4">
+            {friendRequests.map((sender) => (
+              <div
+                key={sender._id}
+                className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-[#1c1f2a] transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 border border-zinc-800">
+                    <AvatarFallback className="bg-[#1c1f2a]">
+                      <User className="h-4 w-4 text-zinc-400" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-medium text-zinc-200">
                         {sender.sender.username}
                       </span>
-                      {sender.sender.email && (
-                        <span className="text-xs text-muted-foreground">
-                          {sender.sender.email}
-                        </span>
+                      {sender.sender.verified && (
+                        <Badge variant="secondary" className="h-4 w-4 bg-blue-500/20 text-blue-400">
+                          ✓
+                        </Badge>
                       )}
                     </div>
+                    <span className="text-xs text-zinc-500">
+                      Super Active
+                    </span>
                   </div>
-                  <button
-                    onClick={() => handleAcceptRequest(sender._id)}
-                    className="text-green-500 hover:text-green-600"
-                    title="Accept Friend Request"
-                    disabled={isAccepting}
-                  >
-                    <FaCheckCircle size={20} />
-                  </button>
                 </div>
-              ))
-            ) : (
-              <div className="text-center text-muted-foreground">
-                No friend requests found
+                <Button
+                  onClick={() => handleAcceptRequest(sender._id)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 h-8"
+                  disabled={isAccepting}
+                >
+                  Follow
+                </Button>
               </div>
-            )}
+            ))}
           </div>
-        </ScrollArea>
-      </div>
+        ) : (
+          <div className="text-center text-zinc-500">
+            No Friend Request found
+          </div>
+        )}
+      </ScrollArea>
     </div>
-  );
+  )
 }
+

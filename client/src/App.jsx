@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Navbar from './components/Navbar';
 import MainHome from './components/MainHome'
+import Sidebar from './components/Sidebar';
 
 const queryClient = new QueryClient();
 
@@ -18,9 +19,10 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen bg-gray-100">
+          <div className=" min-h-screen bg-gray-100">
             <Navbar />
-            <div className="container mx-auto px-4 py-8">
+            <div className="container  bg-[#0f1116] mx-auto px-4 py-8">
+              
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
