@@ -8,6 +8,8 @@ import { useQuery, useMutation } from "react-query";
 import { sendFriendRequest } from "../utils/api";
 import { getFriendRecommendations } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 export default function SuggestedUser() {
   const [friendRecommendations, setFriendRecommendations] = useState([]);
@@ -21,19 +23,7 @@ export default function SuggestedUser() {
   } = useQuery("friendRecommendations", getFriendRecommendations, {
     onSuccess: (res) => {
       const recommendations = res.data || [];
-
-      // Filter recommendations to exclude current user and existing friends
-      const filteredRecommendations = recommendations.filter(
-        (recommendation) => {
-          const isSelf = recommendation.username === user.username;
-          const isFriend = user.friendList.some(
-            (friend) => friend._id === recommendation._id
-          );
-          return !isSelf && !isFriend;
-        }
-      );
-
-      setFriendRecommendations(filteredRecommendations);
+      setFriendRecommendations(recommendations);
     },
     onError: (err) => {
       console.error("Error fetching friend recommendations:", err);
@@ -56,7 +46,7 @@ export default function SuggestedUser() {
   };
 
   return (
-    <Card className="bg-[#1F2128] border-zinc-800 border rounded-[20px]">
+    <Card className="bg-[#1F2128] border-zinc-800 border rounded-[20px] max-w-[500px]">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-sm font-medium text-zinc-100">
@@ -65,12 +55,15 @@ export default function SuggestedUser() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-zinc-100 hover:text-zinc-100"
+            className="h-8 w-8 text-zinc-100 hover:bg-gradient-to-br from-purple-900 to-purple-700"
+            
           >
             <MoreHorizontal className="h-5 w-5" />
           </Button>
         </div>
 
+        <ScrollArea className="max-h-[300px] py-2">
+           
         <div className="space-y-4">
           {isFetching ? (
             <div className="text-center text-zinc-500">Loading...</div>
@@ -96,7 +89,7 @@ export default function SuggestedUser() {
                     <h4 className="text-sm font-medium text-zinc-100">
                       {user.username}
                     </h4>
-                    <p className="text-xs text-zinc-500">Super Active</p>
+                    <p className="text-xs text-zinc-500">{user.email}</p>
                   </div>
                 </div>
                 <Button
@@ -104,7 +97,7 @@ export default function SuggestedUser() {
                     handleSendRequest(user._id);
                     window.location.reload();
                   }}
-                  className="h-8 bg-purple-600 hover:bg-purple-700 text-xs font-medium"
+                  className="h-8 bg-gradient-to-br from-purple-900 to-purple-700 hover:bg-purple-700 text-xs font-medium"
                 >
                   Add Friend
                 </Button>
@@ -116,6 +109,7 @@ export default function SuggestedUser() {
             </div>
           )}
         </div>
+          </ScrollArea>
       </CardContent>
     </Card>
   );

@@ -22,6 +22,8 @@ export default function Login() {
     const storedUser = localStorage.getItem("user")
     const storedToken = localStorage.getItem("token")
 
+    console.log(storedToken)
+
     if (storedUser && storedToken) {
       navigate("/")
     }

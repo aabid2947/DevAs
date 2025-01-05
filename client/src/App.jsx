@@ -20,7 +20,7 @@ export default function App() {
       <AuthProvider>
         <Router>
           <div className=" min-h-screen bg-gray-100">
-            <Navbar />
+            {/* <Navbar /> */}
               
               <Routes>
                 <Route path="/login" element={<Login />} />

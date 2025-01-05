@@ -1,13 +1,14 @@
-import { React, useEffect, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
+
+import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { searchUsers, sendFriendRequest } from "../utils/api";
-import { useQuery, useMutation } from "react-query";
-import { Search, User, X, MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search, X, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useQuery, useMutation } from "react-query";
+import { sendFriendRequest,searchUsers } from "../utils/api";
 
 const fetchUser = async (query) => {
   try {
@@ -18,13 +19,13 @@ const fetchUser = async (query) => {
     throw error;
   }
 };
-
-export default function SearchUser() {
+const SearchUsers = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [triggerSearch, setTriggerSearch] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [isSearchedUserFriend, setIsSearchedUserFriend] = useState(false);
+
 
   const {
     data: users,
@@ -34,8 +35,10 @@ export default function SearchUser() {
   } = useQuery(["searchedUsers", searchQuery], () => fetchUser(searchQuery), {
     enabled: triggerSearch && searchQuery.length > 0,
     onSuccess: (data) => {
+      console.log(90)
       const friendIds = user.friendList.map((friend) => friend._id);
       const isFriend = friendIds.includes(data.data._id);
+
       setIsSearchedUserFriend(isFriend);
       setSearchedUsers(data.data);
       setTriggerSearch(false);
@@ -69,88 +72,99 @@ export default function SearchUser() {
     sendRequest(recipientId);
   };
 
+  const handleClose = () => {
+    setSearchQuery("");
+    setSearchedUsers([]);
+  };
+
   return (
-    <div className="w-full max-w-md bg-[#1F2128] rounded-lg">
-      <div className="px-4 pb-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-          <Input
-            placeholder="Search users..."
-            className="pl-10 bg-[#1c1f2a] border-zinc-700 text-zinc-200 placeholder:text-zinc-500 focus:border-purple-500 focus:ring-purple-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          {searchQuery && (
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSearchedUsers([]);
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 hover:text-zinc-400 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+    <div className="w-full  bg-gradient-to-br from-purple-900 to-purple-700 rounded-2xl p-6 relative">
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-white mb-2">
+          Check What Your Friends Up To!
+        </h2>
+        <p className="hidden text-purple-200/80 text-sm">
+          Conveniently customize proactive web services for leveraged without
+          continualliery aggregate frictionele ou wellis richard and very
+          customize. continually.
+        </p>
+      </div>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-300" />
+        <Input
+          placeholder="Search users..."
+          className="pl-10 bg-purple-900/50 border-purple-600/30 text-white placeholder:text-purple-300 focus:border-purple-400 focus:ring-purple-400 rounded-xl"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        {searchQuery && (
+          <button
+            onClick={handleClose}
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-300 hover:text-purple-200 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
-      <ScrollArea className="h-[400px] px-4 pb-4">
-        {searchedUsers.length > 0 ? (
-          <div className="space-y-2">
-            {searchedUsers.map((user) => (
-              <div
-                key={user._id}
-                className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-[#1c1f2a] transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10 border border-zinc-800">
-                    <AvatarFallback className="bg-[#1c1f2a]">
-                      <User className="h-4 w-4 text-zinc-400" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm font-medium text-zinc-200">
-                        {user.username}
-                      </span>
-                      {user.verified && (
-                        <Badge
-                          variant="secondary"
-                          className="h-4 w-4 bg-blue-500/20 text-blue-400"
-                        >
-                          ✓
-                        </Badge>
+      {/* Search Results Dropdown */}
+      {searchedUsers.length > 0 && (
+        <div className="absolute left-0 right-0 top-full mt-2 bg-gradient-to-br from-purple-900 to-purple-700 rounded-xl shadow-xl z-50 border border-purple-600/30">
+          <ScrollArea className="max-h-[300px] py-2">
+            <div className="space-y-2 px-4">
+              {searchedUsers.map((user) => (
+                <div
+                  key={user._id}
+                  className="flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-purple-800/30 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 border border-purple-600/30">
+                      <AvatarFallback className="bg-purple-900/50">
+                        <User className="h-4 w-4 text-purple-300" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm font-medium text-white">
+                          {user.username}
+                        </span>
+                        {user.verified && (
+                          <Badge
+                            variant="secondary"
+                            className="h-4 w-4 bg-blue-500/20 text-blue-400"
+                          >
+                            ✓
+                          </Badge>
+                        )}
+                      </div>
+                      {user.email && (
+                        <span className="text-xs text-purple-300">
+                          {user.email}
+                        </span>
                       )}
                     </div>
-                    {user.email && (
-                      <span className="text-xs text-zinc-500">
-                        {user.email}
-                      </span>
-                    )}
                   </div>
+                  {!isSearchedUserFriend && (
+                    <Button
+                      onClick={() => {
+                        handleSendRequest(user._id);
+                        handleClose();
+                      }}
+                      className="bg-purple-500 hover:bg-purple-600 text-white text-xs px-4 h-8 rounded-lg"
+                      disabled={isLoading}
+                    >
+                      Add Friend
+                    </Button>
+                  )}
                 </div>
-                {!isSearchedUserFriend && (
-                  <Button
-                    onClick={() => {
-                      handleSendRequest(user._id);
-                      setSearchQuery("");
-
-                      setSearchedUsers([]);
-                    }}
-                    className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 h-8"
-                    disabled={isLoading}
-                  >
-                    Add Friend
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center text-zinc-500 py-4">No users found</div>
-        )}
-      </ScrollArea>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default SearchUsers;

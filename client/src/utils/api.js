@@ -18,7 +18,7 @@ api.interceptors.request.use((config) => {
 });
 
 export const login = (email, password) => api.post('/auth/login', { email, password });
-export const register = (username, email, password) => api.post('/auth/register', { username, email, password });
+export const register = (username, email, password,interests) => api.post('/auth/register', { username, email, password,interests });
 export const searchUsers = (query) => api.get(`/users/search?query=${query}`);
 export const getFriendRecommendations = () => api.get('/users/recommendations');
 export const sendFriendRequest = (recipientId) => api.post('/friends/request', { recipientId });

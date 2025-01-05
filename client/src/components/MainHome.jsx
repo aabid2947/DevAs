@@ -1,16 +1,14 @@
-import { useState, useEffect, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Menu } from "lucide-react";
-import SearchUser from "./SearchUser";
-import FriendRequests from "../components/FriendRequests";
-import UserCard from "./UserCard";
-import SuggestedUser from "./SuggestedUser";
-import Sidebar from "./Sidebar";
 
-export default function MainHome() {
-  const [activeTab, setActiveTab] = useState("friendRequest");
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Menu } from 'lucide-react';
+import Sidebar from "@/components/Sidebar";
+import SearchUser from "@/components/SearchUser";
+import SuggestedUser from "@/components/SuggestedUser";
+import FriendList from "@/components/FriendList";
+import FriendRequests from "../components/FriendRequests";
+
+export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef(null);
 
@@ -36,83 +34,62 @@ export default function MainHome() {
   }, [isSidebarOpen]);
 
   return (
-    <div className="min-h-screen text-zinc-100 bg-[#15161E]">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Mobile Sidebar Toggle */}
-          <div className="lg:hidden col-span-full mb-4">
-            <Button onClick={toggleSidebar} variant="outline" size="icon">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle Sidebar</span>
-            </Button>
-          </div>
+    <div className="flex h-screen overflow-hidden bg-[#15161E] text-zinc-100">
+      {/* Sidebar */}
+      <div
+        ref={sidebarRef}
+        className={`
+          fixed top-0 left-0 h-full w-64 bg-[#161920] border-r border-zinc-800 z-50
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:relative lg:translate-x-0
+        `}
+      >
+        <Sidebar
+          isMobile={typeof window !== "undefined" && window.innerWidth < 1024}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+      </div>
 
-          {/* Sidebar */}
-          <div
-            ref={sidebarRef}
-            className={`
-              fixed top-0 left-0 h-full w-64 bg-[#161920] border-r border-zinc-800 z-50
-              transform transition-transform duration-300 ease-in-out
-              ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-              lg:relative lg:col-span-3 lg:block lg:translate-x-0
-            `}
-          >
-            <Sidebar />
-          </div>
-
-          {/* Overlay */}
-          {isSidebarOpen && (
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-              onClick={() => setIsSidebarOpen(false)} // Close sidebar when overlay is clicked
-            />
-          )}
-
-          {/* Main Content */}
-          <div className="lg:col-span-9 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Search and Friend Requests */}
-              <Card className="bg-[#1F2128] border-zinc-800 border rounded-[20px]">
-                <CardContent className="p-6">
-                  <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid w-full grid-cols-2 bg-zinc-600/50">
-                      <TabsTrigger
-                        value="searchUser"
-                        className="data-[state=active]:bg-zinc-100"
-                      >
-                        Search User
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="friendRequest"
-                        className="data-[state=active]:bg-zinc-100"
-                      >
-                        Friend Requests
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="searchUser" className="mt-4">
-                      <SearchUser />
-                    </TabsContent>
-                    <TabsContent value="friendRequest" className="mt-4">
-                      <FriendRequests />
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
-              
-
-              {/* Suggested Users */}
-              <SuggestedUser />
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          <div className="container mx-auto px-4 py-8">
+            {/* Mobile Sidebar Toggle */}
+            <div className="lg:hidden mb-4">
+              <Button onClick={toggleSidebar} variant="outline" size="icon">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle Sidebar</span>
+              </Button>
             </div>
 
-            {/* User Details */}
-            <Card className="bg-[#161920] border-zinc-800">
-              <CardContent className="p-6">
-                <UserCard />
-              </CardContent>
-            </Card>
+            <div className="space-y-8 ml-8">
+              <div className="flex flex-col md:flex-row gap-8">
+                {/* Left column (5/8 width on md and above) */}
+                <div className="w-full md:w-5/8 space-y-8">
+                  <SearchUser />
+                  <FriendList />
+                </div>
+
+                {/* Right column (3/8 width on md and above) */}
+                <div className="w-full md:w-3/8 space-y-8">
+                  <SuggestedUser />
+                  <FriendRequests />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }
+

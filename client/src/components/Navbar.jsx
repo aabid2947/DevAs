@@ -11,7 +11,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-[#161920] border-b border-zinc-800">
-      <div className="container mx-auto px-4">
+      <div className=" px-4">
         <div className="h-16 flex items-center justify-between gap-4">
           {/* Search Section */}
           <div className="flex-1 max-w-xl">

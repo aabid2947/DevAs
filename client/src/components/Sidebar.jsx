@@ -1,9 +1,10 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, Settings, LogOut, MessageSquare, Users, Bell, Search, Home } from 'lucide-react'
 import { useAuth } from "../contexts/AuthContext"
+import {searchUsers} from "../utils/api"
 
 export default function Sidebar() {
   const { user, logout } = useAuth()
@@ -15,7 +16,20 @@ export default function Sidebar() {
     { icon: Bell, label: 'Notifications' },
     { icon: Search, label: 'Search' },
   ]
+  
+  useEffect(()=>{
+     const getUser  = async ()=>{
+      const query =
+      {
+        username:user.uesrname,
+        email:user.email
+      }
+      const req = await searchUsers(query)
 
+      return
+     }
+     getUser()
+  },[])
   return (
     <div className="fixed left-0 top-0 h-screen w-64 bg-[#161920] border-r border-zinc-800 flex flex-col">
       <CardContent className="flex flex-col p-0">
@@ -32,7 +46,7 @@ export default function Sidebar() {
               <p className="text-xs text-zinc-400">Online</p>
             </div>
           </div>
-          <Button variant="outline" className="w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100">
+          <Button variant="outline" className="w-full bg-gradient-to-br from-purple-900 to-purple-700 border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 rounded-xl">
             View Profile
           </Button>
         </div>

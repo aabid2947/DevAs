@@ -9,24 +9,43 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { FaGoogle, FaApple } from "react-icons/fa";
 import Leaf from "../assets/leaf.png";
+import { Check } from 'lucide-react'
+import { cn } from "@/lib/utils"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
+const interestsOptions = [
+  { value: 'coding', label: 'Coding' },
+  { value: 'reading', label: 'Reading' },
+  { value: 'traveling', label: 'Traveling' },
+  { value: 'sports', label: 'Sports' },
+  { value: 'gaming', label: 'Gaming' },
+  { value: 'music', label: 'Music' },
+  { value: 'cooking', label: 'Cooking' },
+  { value: 'art', label: 'Art' },
+  { value: 'writing', label: 'Writing' },
+  { value: 'photography', label: 'Photography' },
+];
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [interests, setInterests] = useState(""); // State for interests
+  const [interests, setInterests] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Split interests by comma and trim whitespace
-      const interestsArray = interests.split(",").map((item) => item.trim());
+      console.log(interests)
+      const response = await register(username, email, password, interests);
 
-      const response = await register(username, email, password, interestsArray);
-      alert(response.data.message);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       localStorage.setItem("token", response.data.token);
       login(response.data.user, response.data.token);
@@ -34,6 +53,14 @@ export default function Register() {
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");
     }
+  };
+
+  const toggleInterest = (value) => {
+    setInterests(prev =>
+      prev.includes(value)
+        ? prev.filter(i => i !== value)
+        : [...prev, value]
+    );
   };
 
   return (
@@ -100,16 +127,46 @@ export default function Register() {
                     htmlFor="interests"
                     className="block text-sm font-medium text-zinc-300 mb-1"
                   >
-                    Interests (comma-separated)
+                    Interests
                   </label>
-                  <Input
-                    type="text"
-                    id="interests"
-                    value={interests}
-                    onChange={(e) => setInterests(e.target.value)}
-                    placeholder="e.g., coding, reading, traveling"
-                    className="w-full bg-[#1c1f2a] border-zinc-700 text-zinc-100 focus:border-purple-500 focus:ring-purple-500"
-                  />
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className="w-full justify-between bg-[#1c1f2a] border-zinc-700 text-zinc-100 hover:bg-[#252935] hover:text-zinc-100"
+                      >
+                        {interests.length > 0
+                          ? `${interests.length} selected`
+                          : "Select interests..."}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <div className="bg-[#1c1f2a] text-zinc-100 p-2">
+                        {interestsOptions.map((interest) => (
+                          <button
+                            key={interest.value}
+                            onClick={() => toggleInterest(interest.value)}
+                            className={cn(
+                              "flex items-center w-full px-2 py-1 text-left text-sm rounded-md",
+                              interests.includes(interest.value)
+                                ? "bg-purple-600 text-white"
+                                : "hover:bg-[#252935]"
+                            )}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                interests.includes(interest.value) ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {interest.label}
+                          </button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <Button
                   type="submit"
@@ -154,3 +211,4 @@ export default function Register() {
     </div>
   );
 }
+
